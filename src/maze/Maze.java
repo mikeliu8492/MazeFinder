@@ -23,6 +23,13 @@ public class Maze
 	private ArrayList<Coordinates> foodSpots;
 	
 	/**
+	 * Copy of the foodSpots list that we will pop from.  Indicates when all dots
+	 * have been consumed and the search ends.
+	 */
+	private ArrayList<Coordinates> accountingForFoods;
+	
+	
+	/**
 	 * coordinate for where pacman starts
 	 */
 	private Coordinates pacmanStart;
@@ -33,6 +40,7 @@ public class Maze
 	
 	private PacMan ourHero;
 	
+	
 	/**
 	 * initializes maze, sets up food, and erects walls
 	 * @param fileToParse			String of file to parts for maze
@@ -41,11 +49,13 @@ public class Maze
 	public Maze(String fileToParse) throws IOException
 	{
 		foodSpots = new ArrayList<Coordinates>();
+		accountingForFoods = new ArrayList<Coordinates>();
 		setDimensions(fileToParse);
 		mazeForm = new Tile[totalRows][totalColumns];
 		instantiateMaze();
 		erectWalls(fileToParse);
 		ourHero = new PacMan(this, pacmanStart.getRow(), pacmanStart.getColumn());
+		distanceFill();
 	}
 	
 	
@@ -100,6 +110,48 @@ public class Maze
 	
 	
 	/**
+	 * Examines maze based on food locations.  Fills variable distanceToFood with Manhattan distance
+	 * to the closest food dot.
+	 */
+	private void distanceFill()
+	{
+		for(int row = 0; row < totalRows; row++)
+		{
+			for(int col = 0; col < totalColumns; col++)
+			{
+				
+				calculateClosestDistance(row, col, this.getTile(row, col));
+			}
+		}
+		
+	}
+	
+	/**
+	 * Helper functions to compare Manhattan distance of one point to a food item to other food items.
+	 * Returns distance to closest food item.
+	 * 
+	 * @param row			row of current tile
+	 * @param col			column of current tile
+	 * @param currentTile	
+	 */
+	private void calculateClosestDistance(int row, int col, Tile currentTile)
+	{
+		int min = currentTile.getDistance();
+		if(!currentTile.solidWall())
+		{
+			for(Coordinates coordinate : accountingForFoods)
+			{
+				int total = Math.abs(coordinate.getRow()-row) + Math.abs(coordinate.getColumn()-col);
+				if(min > total)
+					min = total;
+			}
+		}
+		
+		currentTile.setDistance(min);
+	}
+	
+	
+	/**
 	 * Get the tile on the board.
 	 * @param row
 	 * @param col
@@ -150,7 +202,11 @@ public class Maze
 				if(strLine.charAt(col) == '%')
 					mazeForm[lines][col].setWall();
 				else if(strLine.charAt(col) == '.')
+				{
 					foodSpots.add(new Coordinates(lines, col));
+					accountingForFoods.add(new Coordinates(lines, col));
+				}
+					
 				else if(strLine.charAt(col) == 'P')
 					pacmanStart = new Coordinates(lines, col);
 				col++;
@@ -162,6 +218,28 @@ public class Maze
 		in.close();
 		fstream.close();
 		
+	}
+	
+	/**
+	 * Display the distances on the board per non-wall tile to the nearest food items.
+	 */
+	
+	public void displayDistances()
+	{
+		for(int row = 0; row < totalRows; row++)
+		{
+			for(int col = 0; col < totalColumns; col++)
+			{
+				if(!mazeForm[row][col].solidWall())
+				{
+						System.out.print("Rows:  " + row +"   ");
+						System.out.print("Col:  " + col +"   ");
+						System.out.print("Distance to food:  " + mazeForm[row][col].getDistance() + "  ");
+						System.out.println();
+				}
+
+			}
+		}
 	}
 	
 
@@ -191,6 +269,7 @@ public class Maze
 		
 		return false;
 	}
+	
 	/**
 	 * locates the pacman object, see if he's in a specific tile
 	 * @param row

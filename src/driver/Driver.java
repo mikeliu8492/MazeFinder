@@ -10,7 +10,7 @@ public class Driver
 	public static void main(String args[]) throws IOException
 	{
 		
-		String FILE_TO_READ = "mediumMaze.txt";
+		String FILE_TO_READ = "tinySearch.txt";
 		Maze myMaze = new Maze(FILE_TO_READ);
 		
 		System.out.println(myMaze.getRows());
@@ -18,6 +18,11 @@ public class Driver
 		
 		System.out.println("\n\n");
 		myMaze.displayMaze();
+		
+		System.out.println("\n\n");
+		
+		myMaze.displayDistances();
+		
 	
 		
 	}

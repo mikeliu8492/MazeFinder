@@ -6,6 +6,7 @@ public class Tile
 	private boolean isWall;
 	private int row;
 	private int column;
+	private int distanceToFood;
 
 	public boolean solidWall()
 	{
@@ -29,6 +30,7 @@ public class Tile
 		this.row = row;
 		this.column = col;
 		this.isWall = false;
+		this.distanceToFood = 1000000000;
 	}
 	
 	//convert tile to wall
@@ -42,11 +44,20 @@ public class Tile
 	}
 
 
-	public int getColumn() {
+	public int getColumn() 
+	{
 		return column;
 	}
-
 	
+	public void setDistance(int distance)
+	{
+		this.distanceToFood = distance;
+	}
+
+	public int getDistance()
+	{
+		return distanceToFood;
+	}
 	
 	
 }
