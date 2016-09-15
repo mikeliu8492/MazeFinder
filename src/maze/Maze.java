@@ -10,16 +10,34 @@ import java.util.*;
 
 public class Maze 
 {
-
+	/**
+	 * create the maze form
+	 */
 	private Tile [][] mazeForm;
 	private int totalRows;
 	private int totalColumns;
 	
+	/**
+	 * the spots where there is dots for pacman to eat
+	 */
 	private ArrayList<Coordinates> foodSpots;
+	
+	/**
+	 * coordinate for where pacman starts
+	 */
 	private Coordinates pacmanStart;
+	
+	/**
+	 * pacman tracks his own path
+	 */
 	
 	private PacMan ourHero;
 	
+	/**
+	 * initializes maze, sets up food, and erects walls
+	 * @param fileToParse			String of file to parts for maze
+	 * @throws IOException
+	 */
 	public Maze(String fileToParse) throws IOException
 	{
 		foodSpots = new ArrayList<Coordinates>();
@@ -30,6 +48,12 @@ public class Maze
 		ourHero = new PacMan(this, pacmanStart.getRow(), pacmanStart.getColumn());
 	}
 	
+	
+	/**
+	 * helper to determine dimensions of maze based on file
+	 * @param fileToParse
+	 * @throws IOException
+	 */
 	void setDimensions(String fileToParse) throws IOException
 	{
 		FileInputStream fstream = new FileInputStream(fileToParse);
@@ -52,6 +76,10 @@ public class Maze
 		this.totalRows = lines;
 	}
 	
+	
+	/**
+	 * Displays maze to confirm accuracy
+	 */
 	public void displayMaze()
 	{
 		for (int i = 0; i < totalRows; i++)
@@ -70,6 +98,13 @@ public class Maze
 		}
 	}
 	
+	
+	/**
+	 * Get the tile on the board.
+	 * @param row
+	 * @param col
+	 * @return
+	 */
 	public Tile getTile(int row, int col)
 	{
 		
@@ -78,6 +113,10 @@ public class Maze
 		return null;
 	}
 	
+	
+	/**
+	 * helper to build maze of empty tiles
+	 */
 	private void instantiateMaze()
 	{
 		for (int i = 0; i < totalRows; i++)
@@ -89,6 +128,11 @@ public class Maze
 		}
 	}
 	
+	/**
+	 * helper to erect wass in the maze
+	 * @param fileToParse
+	 * @throws IOException
+	 */
 	private void erectWalls(String fileToParse) throws IOException
 	{
 		FileInputStream fstream = new FileInputStream(fileToParse);
@@ -131,6 +175,12 @@ public class Maze
 		return totalColumns;
 	}
 	
+	/**
+	 * Determine if a specific space has a foodspot.
+	 * @param row
+	 * @param col
+	 * @return
+	 */
 	private boolean isFoodSpot(int row, int col)
 	{
 		for(Coordinates coordinates : foodSpots)
@@ -141,7 +191,12 @@ public class Maze
 		
 		return false;
 	}
-	
+	/**
+	 * locates the pacman object, see if he's in a specific tile
+	 * @param row
+	 * @param col
+	 * @return
+	 */
 	private boolean locatedPacman(int row, int col)
 	{
 		if(row == ourHero.getCurrentRow() && col == ourHero.getCurrentColumn())
@@ -149,6 +204,12 @@ public class Maze
 		return false;
 	}
 	
+	/**
+	 * determine manhattan distance to a specific tile
+	 * @param destination
+	 * @param currentTile
+	 * @return
+	 */
 	private int manhattan(Coordinates destination, Tile currentTile)
 	{
 		int destinationRow = destination.getRow();
@@ -160,6 +221,13 @@ public class Maze
 		return Math.abs(destinationRow-currentRow) + Math.abs(destinationCol-currentCol);
 	}
 	
+	
+	/**
+	 * TODO:  not sure what this is yet, part of heuristic let me figure it out.
+	 * @param destination
+	 * @param currentTile
+	 * @return
+	 */
 	private Tile evaluateNeighbors(Coordinates destination, Tile currentTile)
 	{
 		int currentRow = currentTile.getRow();

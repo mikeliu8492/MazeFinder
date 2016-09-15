@@ -4,6 +4,8 @@ import java.util.ArrayList;
 
 public class PacMan 
 {
+	//PACMAN objects, intends for him to keep track of where he goes and where his start position is
+	
 	private Maze assignedMaze;
 	private ArrayList<Movement> movementList;
 	private int currentRow;

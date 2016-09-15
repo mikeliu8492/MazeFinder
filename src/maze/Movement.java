@@ -2,10 +2,13 @@ package maze;
 
 public class Movement 
 {
-	private int rowChange;
-	private int columnChange;
-	private int stayRow;
-	private int stayColumn;
+	/**
+	 * keeps track of path pacman takes
+	 */
+	private int rowChange;//difference in row change
+	private int columnChange;//differnce in column change
+	private int stayRow;//row where pacman stops before transition
+	private int stayColumn;//column where pacman stops before transition
 	
 	public Movement(final int rowChange, final int columnChange, final int row, final int column)
 	{
