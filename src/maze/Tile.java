@@ -1,28 +1,35 @@
 package maze;
 
-public class Tile 
+import java.util.*;
+
+public class Tile implements Comparable<Tile>
 {
 	//Tile class has boolean to determine if it is a wall.  if it is a wall, then the pacman can't go there
-	private boolean isWall;
-	private int row;
-	private int column;
-	private int distanceToFood;
-
-	public boolean solidWall()
-	{
-		return isWall;
-	};
+	public boolean isWall;
+	public boolean visited;
+	
+	public int row;
+	public int column;
+	
+	public Tile parent;
+	
+	/**
+	 * only distance to food is used for greedy
+	 * the "heuristicScore" is used for A*
+	 */
+	public int heuristicScore;
+	public int distanceTraveled;
+	public int distanceToFood;
 	
 	//print visualization on the console
 	public void printTileStatus()
 	{
-		if(solidWall())
+		if(isWall)
 			System.out.print("%");
 		else
 			System.out.print(" ");
 		
 	};
-	
 	
 	//create an empty tile
 	public Tile(int row, int col)
@@ -30,34 +37,31 @@ public class Tile
 		this.row = row;
 		this.column = col;
 		this.isWall = false;
+		this.visited = false;
 		this.distanceToFood = 1000000000;
+		this.distanceTraveled = 0;
 	}
 	
-	//convert tile to wall
-	public void setWall()
-	{
-		this.isWall = true;
-	}
-
-	public int getRow() {
-		return row;
-	}
-
-
-	public int getColumn() 
-	{
-		return column;
-	}
 	
-	public void setDistance(int distance)
+	
+	/**
+	 * Method for priority queue. Uses heuristic of manhattan distance to nearest food item
+	 * as heuristic.  The lost the distance, the higher the priority.
+	 */
+
+	@Override
+	public int compareTo(Tile other) 
 	{
-		this.distanceToFood = distance;
+		if(this.distanceToFood < other.distanceToFood)
+			return 1;
+		else if (this.distanceToFood == other.distanceToFood)
+			return 0;
+		else
+			return -1;
+
 	}
 
-	public int getDistance()
-	{
-		return distanceToFood;
-	}
+
 	
 	
 }

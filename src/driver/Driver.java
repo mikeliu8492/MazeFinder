@@ -10,7 +10,9 @@ public class Driver
 	public static void main(String args[]) throws IOException
 	{
 		
-		String FILE_TO_READ = "tinySearch.txt";
+		//change the name to any of the three mazes, and you can follow the basic heuristic
+		String FILE_TO_READ = "openMaze.txt";
+		
 		Maze myMaze = new Maze(FILE_TO_READ);
 		
 		System.out.println(myMaze.getRows());
@@ -23,7 +25,16 @@ public class Driver
 		
 		myMaze.displayDistances();
 		
-	
+		/**
+		 * call DFS for depth first
+		 * call BFS for breadth first
+		 * call Greedy for greedy best-first
+		 * A* not implemented yet
+		 */
+		
+		myMaze.A_STAR(myMaze.getOrigin());
+		
+		
 		
 	}
 	
