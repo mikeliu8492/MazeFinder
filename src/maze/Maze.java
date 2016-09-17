@@ -686,7 +686,7 @@ public class Maze
 				boolean lowerCostOpen = samePositionlowerCost(neighbor, newTotalCost, open);
 				boolean lowerCostClosed = samePositionlowerCost(neighbor, newTotalCost, closed);
 				
-				if(!inClosed(neighbor) && !inOpen(neighbor))
+				if(!inOpen(neighbor))
 				{
 					neighbor.distanceTraveled = newDistanceCost;
 					neighbor.heuristicScore = newTotalCost;
