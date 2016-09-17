@@ -739,12 +739,10 @@ public class Maze
 		int evalRow = myParent.row + rowChange;
 		int evalCol = myParent.column + colChange;
 		Tile evaluated = mazeForm[evalRow][evalCol];
-		if(!evaluated.isWall && ! inClosed(evaluated))
-		{
+		if(!evaluated.isWall && !inClosed(evaluated))
+		{ 
 			evaluated.parent = myParent;
 			neighbors.add(evaluated);
-			if(!inOpen(evaluated))
-				open.add(evaluated);
 		}
 	}
 	
