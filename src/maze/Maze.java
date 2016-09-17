@@ -13,6 +13,9 @@ public class Maze
 	/**
 	 * create the maze form
 	 */
+	
+	public int dotsFound = 0;
+	public int dotsTotal;
 	private Tile [][] mazeForm;
 	private int totalRows;
 	private int totalColumns;
@@ -72,6 +75,8 @@ public class Maze
 		instantiateMaze();
 		erectWalls(fileToParse);
 		distanceFill();
+		dotsTotal = foodSpots.size();
+		dotsFound = 0;
 	}
 	
 	
@@ -165,6 +170,7 @@ public class Maze
 		
 		currentTile.distanceToFood = min;
 		currentTile.heuristicScore = currentTile.distanceToFood;
+		currentTile.recalculateHeuristic();
 	}
 	
 	
@@ -280,7 +286,7 @@ public class Maze
 	 */
 	private boolean isFoodSpot(int row, int col)
 	{
-		for(Coordinates coordinates : foodSpots)
+		for(Coordinates coordinates : accountingForFoods)
 		{
 			if(row == coordinates.getRow() && col == coordinates.getColumn())
 				return true;
@@ -337,11 +343,13 @@ public class Maze
 		
 		searchStore.push(startTile);
 		
-		int squaresSearched = 1;
+		int squaresSearched = 0;
 		while(searchStore.size() > 0)
 		{
 			
 			Tile currentTile = searchStore.pop();
+			squaresSearched++;
+			
 			int currentRow = currentTile.row;
 			int currentColumn = currentTile.column;
 			
@@ -362,28 +370,28 @@ public class Maze
 				searchStore.push(right);
 				right.visited = true;
 				right.parent = currentTile;
-				squaresSearched++;
+				//squaresSearched++;
 			}
 			if(!up.isWall && !up.visited)
 			{
 				searchStore.push(up);
 				up.visited = true;
 				up.parent = currentTile;
-				squaresSearched++;
+				//squaresSearched++;
 			}
 			if(!left.isWall && !left.visited)
 			{
 				searchStore.push(left);
 				left.visited = true;
 				left.parent = currentTile;
-				squaresSearched++;
+				//squaresSearched++;
 			}
 			if(!down.isWall && !down.visited)
 			{
 				searchStore.push(down);
 				down.visited = true;
 				down.parent = currentTile;
-				squaresSearched++;
+				//squaresSearched++;
 			}
 			
 			
@@ -407,17 +415,15 @@ public class Maze
 		Tile startTile = this.getTile(thePoint.getRow(), thePoint.getColumn());
 		startTile.visited = true;
 		
-		System.out.println(startTile.row);
-		System.out.println(startTile.column);
-		
 		
 		searchStore.add(startTile);
 		
-		int squaresSearched = 1;
+		int squaresSearched = 0;
 		while(searchStore.size() > 0)
 		{
 			
 			Tile currentTile = searchStore.poll();
+			squaresSearched++;
 			int currentRow = currentTile.row;
 			int currentColumn = currentTile.column;
 			
@@ -425,6 +431,8 @@ public class Maze
 			{
 				System.out.println("FOUND FINAL TILE!");
 				finalDestination = currentTile;
+				System.out.println("dest row "+ finalDestination.row);
+				System.out.println("dest col "+finalDestination.column);
 				break;
 			}
 			
@@ -438,28 +446,25 @@ public class Maze
 				searchStore.add(right);
 				right.visited = true;
 				right.parent = currentTile;
-				squaresSearched++;
+				
 			}
 			if(!up.isWall && !up.visited)
 			{
 				searchStore.add(up);
 				up.visited = true;
 				up.parent = currentTile;
-				squaresSearched++;
 			}
 			if(!left.isWall && !left.visited)
 			{
 				searchStore.add(left);
 				left.visited = true;
 				left.parent = currentTile;
-				squaresSearched++;
 			}
 			if(!down.isWall && !down.visited)
 			{
 				searchStore.add(down);
 				down.visited = true;
 				down.parent = currentTile;
-				squaresSearched++;
 			}
 			
 			
@@ -468,6 +473,7 @@ public class Maze
 		this.squaresExplored = squaresSearched;
 		System.out.println("\n\n\n");
 		showMazePath();
+		System.out.println("\n\n\n");
 	}
 	
 	/**
@@ -487,11 +493,12 @@ public class Maze
 		
 		searchStore.add(startTile);
 		
-		int squaresSearched = 1;
+		int squaresSearched = 0;
 		while(searchStore.size() > 0)
 		{
 			
 			Tile currentTile = searchStore.poll();
+			squaresSearched++;
 			int currentRow = currentTile.row;
 			int currentColumn = currentTile.column;
 			
@@ -512,37 +519,31 @@ public class Maze
 				searchStore.add(right);
 				right.visited = true;
 				right.parent = currentTile;
-				squaresSearched++;
 			}
 			if(!up.isWall && !up.visited)
 			{
 				searchStore.add(up);
 				up.visited = true;
 				up.parent = currentTile;
-				squaresSearched++;
 			}
 			if(!left.isWall && !left.visited)
 			{
 				searchStore.add(left);
 				left.visited = true;
 				left.parent = currentTile;
-				squaresSearched++;
 			}
 			if(!down.isWall && !down.visited)
 			{
-				if(squaresSearched == 1)
-					System.out.println("visited here!");
 				searchStore.add(down);
 				down.visited = true;
 				down.parent = currentTile;
-				squaresSearched++;
 			}
 			
 			
 		}
 		
 		this.squaresExplored = squaresSearched;
-		System.out.println("\n\n\n");
+		System.out.println("\n");
 		showMazePath();
 	}
 	
@@ -654,23 +655,28 @@ public class Maze
 	{
 		
 		Tile startTile = this.getTile(thePoint.getRow(), thePoint.getColumn());
+		PriorityQueue<Tile> searchStore = new PriorityQueue<Tile>();
 		
-		int counter = 1;
 		
-		open.add(startTile);
-		while (!open.isEmpty())
+		int counter = 0;
+		
+		searchStore.add(startTile);
+		
+		while (!searchStore.isEmpty())
 		{
-			Tile minTile = leastCost(open);
+			System.out.println("entered loop");
+			Tile minTile = searchStore.poll();
 			
 			int minRow = minTile.row;
 			int minCol = minTile.column;
 			
-			open.remove(minTile);
 			closed.add(minTile);
 			if(isFoodSpot(minRow, minCol))
 			{
 				finalDestination = mazeForm[minRow][minCol];
-				System.out.println("final destiny!");
+				System.out.println("FOUND FINAL TILE!");
+				System.out.println("dest row "+ finalDestination.row);
+				System.out.println("dest col "+finalDestination.column);
 				break;
 			}
 			
@@ -680,23 +686,21 @@ public class Maze
 
 			for (Tile neighbor : neighbors)
 			{
+				
 				int newDistanceCost = minTile.distanceTraveled + 1;
 				int newTotalCost = neighbor.distanceToFood + newDistanceCost;
-				
-				boolean lowerCostOpen = samePositionlowerCost(neighbor, newTotalCost, open);
-				boolean lowerCostClosed = samePositionlowerCost(neighbor, newTotalCost, closed);
-				
-				if(!inClosed(neighbor) && !inOpen(neighbor))
-				{
-					neighbor.distanceTraveled = newDistanceCost;
-					neighbor.heuristicScore = newTotalCost;
-					open.add(neighbor);
-					neighbor.parent = minTile;
-					counter++;
-				}
+
+				System.out.println("outside neighbor row " + neighbor.row + "  outside neighbor col " + neighbor.column);
+				samePositionlowerCost(neighbor, minTile, newTotalCost, newDistanceCost, searchStore);
 				
 				
 				
+			}
+			
+			Tile other = searchStore.poll();
+			if(other.heuristicScore < minTile.heuristicScore)
+			{
+				searchStore.add(other);
 			}
 			
 		}
@@ -709,7 +713,7 @@ public class Maze
 
 	
 	/**
-	 * helper method to 
+	 * helper method to populate an array with neighbors
 	 * @param neighbors		populate this array
 	 * @param minTile		the parent tile to get neighbors
 	 */
@@ -727,7 +731,7 @@ public class Maze
 	
 	
 	/**
-	 * Populate the list for processing neighbors
+	 * What to do for each neighbor.  Calculate the heuristic and link it with parent
 	 * @param neighbors			array to populate
 	 * @param myParent			the parent node
 	 * @param rowChange			offset row-wise from parent
@@ -748,29 +752,67 @@ public class Maze
 	
 	
 	/**
-	 * determine if a tile is the same position but lower cost in the terms of distance traveled
+	 * determine if a tile is the same position but lower cost in the terms of distance traveled,
+	 * maybe deprecated b/c priority queue
 	 * @param emu			imitation tile to pass int data
 	 * @param cost			total cost of travel and heuristic
 	 * @param inspection	list to inspect against(open or closed list)
 	 * @return
 	 */
-	private boolean samePositionlowerCost(Tile emu, int cost, ArrayList<Tile> inspection)
+	private boolean samePositionlowerCost(Tile emu, Tile curParent, int cost, int distanceTraveled, PriorityQueue<Tile> inspection)
 	{
 		int emuRow = emu.column;
 		int emuCol = emu.row;
 		
+		PriorityQueue<Tile> temp = new PriorityQueue<Tile>();
+		Tile compareTile = null;
+		boolean existsInHeap = false;
+		boolean lowerCostFound = false;
 		
-		for(Tile tile : inspection)
+		
+		if(inspection.isEmpty())
 		{
-			if(emuRow == tile.row && emuCol == tile.column)
+			inspection.add(emu);
+		}
+		else
+		{
+			while(!inspection.isEmpty())
 			{
-				if(cost < tile.heuristicScore)
+				//System.out.println("entered loop");
+				compareTile = inspection.poll();			
+				if(emuRow == compareTile.row && emuCol == compareTile.column)
 				{
-					inspection.remove(tile);
-					return true;
+					existsInHeap = true;
+					if(cost < compareTile.heuristicScore)
+					{
+						compareTile.heuristicScore = cost;
+						compareTile.distanceTraveled = distanceTraveled;
+						compareTile.parent = curParent;
+						temp.add(compareTile);
+						lowerCostFound = true;
+					}
+					break;
+					
+					
+					
 				}
+				else
+				{
+					temp.add(compareTile);
+				}
+				
+				
 			}
 		}
+
+		
+		
+		while(!temp.isEmpty())
+		{
+			inspection.add(temp.poll());
+			
+		}
+
 		
 		return false;
 	}
@@ -817,4 +859,67 @@ public class Maze
 	{
 		return pacmanStart;
 	}
+	
+	
+	/**
+	 * For now this uses BFS for debugging, the logic should be correct in decreasing the remaining dots to
+	 * be eaten.
+	 * @param thePoint
+	 */
+	
+	public void A_STAR_MULTI(Coordinates thePoint)
+	{
+		Coordinates pacmanStart = thePoint;
+		Tile briefStop;
+		
+		while(!accountingForFoods.isEmpty())
+		{
+			BFS(pacmanStart);
+			briefStop = finalDestination;
+			Coordinates toEliminate = null;
+			
+			for(Coordinates coordinate : accountingForFoods)
+			{
+				if(coordinate.getRow() == briefStop.row && coordinate.getColumn() == briefStop.column)
+				{
+					toEliminate = coordinate;
+					break;
+				}
+					
+			}
+			
+			if(toEliminate != null)
+			{
+				accountingForFoods.remove(toEliminate);
+				dotsFound++;
+			}
+				
+			
+			//open.clear();
+			//closed.clear();
+			
+			//retool the distances
+			distanceFill();
+			clearMaze();
+			
+			pacmanStart = new Coordinates(briefStop.row, briefStop.column);
+		}
+	}
+
+
+	/**
+	 * set all visited variables to false and parent variables to null
+	 */
+	private void clearMaze()
+	{
+		for(int row = 0; row < totalRows; row++)
+		{
+			for(int col = 0; col < totalColumns; col++)
+			{
+				mazeForm[row][col].visited= false;
+				mazeForm[row][col].parent = null;
+			}
+		}
+	}
+	
 }

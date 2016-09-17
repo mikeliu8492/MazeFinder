@@ -40,24 +40,41 @@ public class Tile implements Comparable<Tile>
 		this.visited = false;
 		this.distanceToFood = 1000000000;
 		this.distanceTraveled = 0;
+		this.heuristicScore = distanceToFood+distanceTraveled;
 	}
 	
+	/**
+	 * recalculate the heuristic score on update of the distance traveled score
+	 */
+	
+	public void recalculateHeuristic()
+	{
+		this.heuristicScore = heuristicScore+distanceTraveled;
+	}
 	
 	
 	/**
 	 * Method for priority queue. Uses heuristic of manhattan distance to nearest food item
-	 * as heuristic.  The lost the distance, the higher the priority.
+	 * as heuristic.  The shorter the distance, the higher the priority.  Still needs work implementing
+	 * the comprable
 	 */
 
 	@Override
 	public int compareTo(Tile other) 
 	{
 		if(this.distanceToFood < other.distanceToFood)
-			return 1;
+			return 5;
 		else if (this.distanceToFood == other.distanceToFood)
-			return 0;
+		{
+			if(this.heuristicScore < other.heuristicScore)
+				return 4;
+			if(this.heuristicScore == other.heuristicScore)
+				return 3;
+			else
+				return 2;
+		}
 		else
-			return -1;
+			return 1;
 
 	}
 

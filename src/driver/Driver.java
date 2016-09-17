@@ -11,19 +11,19 @@ public class Driver
 	{
 		
 		//change the name to any of the three mazes, and you can follow the basic heuristic
-		String FILE_TO_READ = "openMaze.txt";
+		String FILE_TO_READ = "mediumMaze.txt";
 		
 		Maze myMaze = new Maze(FILE_TO_READ);
 		
 		System.out.println(myMaze.getRows());
 		System.out.println(myMaze.getColumns());
 		
-		System.out.println("\n\n");
+		//System.out.println("\n\n");
 		myMaze.displayMaze();
 		
-		System.out.println("\n\n");
+		//System.out.println("\n\n");
 		
-		myMaze.displayDistances();
+		//myMaze.displayDistances();
 		
 		/**
 		 * call DFS for depth first
@@ -32,9 +32,9 @@ public class Driver
 		 * A* not implemented yet
 		 */
 		
-		myMaze.A_STAR(myMaze.getOrigin());
-		
-		
+		myMaze.Greedy(myMaze.getOrigin());
+		System.out.println("Orig dots:  " + myMaze.dotsTotal);
+		System.out.println("found dots:  " + myMaze.dotsFound);
 		
 	}
 	
