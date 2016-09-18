@@ -689,9 +689,24 @@ public class Maze
 				
 				int newDistanceCost = minTile.distanceTraveled + 1;
 				int newTotalCost = neighbor.distanceToFood + newDistanceCost;
+<<<<<<< HEAD
 
 				System.out.println("outside neighbor row " + neighbor.row + "  outside neighbor col " + neighbor.column);
 				samePositionlowerCost(neighbor, minTile, newTotalCost, newDistanceCost, searchStore);
+=======
+				
+				boolean lowerCostOpen = samePositionlowerCost(neighbor, newTotalCost, open);
+				boolean lowerCostClosed = samePositionlowerCost(neighbor, newTotalCost, closed);
+				
+				if(!inOpen(neighbor))
+				{
+					neighbor.distanceTraveled = newDistanceCost;
+					neighbor.heuristicScore = newTotalCost;
+					open.add(neighbor);
+					neighbor.parent = minTile;
+					counter++;
+				}
+>>>>>>> 6d708725d63ff25e16ed95cd631202cba4b7bfe8
 				
 				
 				
