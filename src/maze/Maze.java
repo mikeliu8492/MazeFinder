@@ -664,13 +664,14 @@ public class Maze
 		
 		while (!searchStore.isEmpty())
 		{
-			System.out.println("entered loop");
+			//System.out.println("entered loop");
 			Tile minTile = searchStore.poll();
 			
 			int minRow = minTile.row;
 			int minCol = minTile.column;
 			
 			closed.add(minTile);
+			
 			if(isFoodSpot(minRow, minCol))
 			{
 				finalDestination = mazeForm[minRow][minCol];
@@ -689,34 +690,33 @@ public class Maze
 				
 				int newDistanceCost = minTile.distanceTraveled + 1;
 				int newTotalCost = neighbor.distanceToFood + newDistanceCost;
-<<<<<<< HEAD
-
-				System.out.println("outside neighbor row " + neighbor.row + "  outside neighbor col " + neighbor.column);
-				samePositionlowerCost(neighbor, minTile, newTotalCost, newDistanceCost, searchStore);
-=======
+					
+				int emuRow = neighbor.column;
+				int emuCol = neighbor.row;
 				
-				boolean lowerCostOpen = samePositionlowerCost(neighbor, newTotalCost, open);
-				boolean lowerCostClosed = samePositionlowerCost(neighbor, newTotalCost, closed);
-				
-				if(!inOpen(neighbor))
+				if(newTotalCost < neighbor.heuristicScore || !inOpen(neighbor))
 				{
-					neighbor.distanceTraveled = newDistanceCost;
 					neighbor.heuristicScore = newTotalCost;
-					open.add(neighbor);
+					neighbor.distanceTraveled = newDistanceCost;
 					neighbor.parent = minTile;
-					counter++;
+					
+					if(!inOpen(neighbor))
+					{
+						searchStore.add(neighbor);
+					}
+					else
+					{
+						boolean removeNeighbor = searchStore.remove(neighbor);
+						searchStore.add(neighbor);
+					}
 				}
->>>>>>> 6d708725d63ff25e16ed95cd631202cba4b7bfe8
+				
 				
 				
 				
 			}
 			
-			Tile other = searchStore.poll();
-			if(other.heuristicScore < minTile.heuristicScore)
-			{
-				searchStore.add(other);
-			}
+			neighbors.clear();
 			
 		}
 		
@@ -760,7 +760,6 @@ public class Maze
 		Tile evaluated = mazeForm[evalRow][evalCol];
 		if(!evaluated.isWall && !inClosed(evaluated))
 		{ 
-			evaluated.parent = myParent;
 			neighbors.add(evaluated);
 		}
 	}
@@ -774,64 +773,14 @@ public class Maze
 	 * @param inspection	list to inspect against(open or closed list)
 	 * @return
 	 */
-	private boolean samePositionlowerCost(Tile emu, Tile curParent, int cost, int distanceTraveled, PriorityQueue<Tile> inspection)
+	/*
+	private boolean samePositionlowerCost(Tile neighborTile, Tile curParent, int newCost, int newDistanceTraveled, PriorityQueue<Tile> )
 	{
-		int emuRow = emu.column;
-		int emuCol = emu.row;
-		
-		PriorityQueue<Tile> temp = new PriorityQueue<Tile>();
-		Tile compareTile = null;
-		boolean existsInHeap = false;
-		boolean lowerCostFound = false;
-		
-		
-		if(inspection.isEmpty())
-		{
-			inspection.add(emu);
-		}
-		else
-		{
-			while(!inspection.isEmpty())
-			{
-				//System.out.println("entered loop");
-				compareTile = inspection.poll();			
-				if(emuRow == compareTile.row && emuCol == compareTile.column)
-				{
-					existsInHeap = true;
-					if(cost < compareTile.heuristicScore)
-					{
-						compareTile.heuristicScore = cost;
-						compareTile.distanceTraveled = distanceTraveled;
-						compareTile.parent = curParent;
-						temp.add(compareTile);
-						lowerCostFound = true;
-					}
-					break;
-					
-					
-					
-				}
-				else
-				{
-					temp.add(compareTile);
-				}
-				
-				
-			}
-		}
 
 		
-		
-		while(!temp.isEmpty())
-		{
-			inspection.add(temp.poll());
-			
-		}
-
-		
-		return false;
+		return true;
 	}
-
+	*/
 	
 	/**
 	 * tile is in closed list
@@ -889,7 +838,7 @@ public class Maze
 		
 		while(!accountingForFoods.isEmpty())
 		{
-			BFS(pacmanStart);
+			A_STAR(pacmanStart);
 			briefStop = finalDestination;
 			Coordinates toEliminate = null;
 			
@@ -910,12 +859,14 @@ public class Maze
 			}
 				
 			
-			//open.clear();
-			//closed.clear();
+			open.clear();
+			closed.clear();
 			
 			//retool the distances
 			distanceFill();
 			clearMaze();
+			
+			System.out.println("accounting for food:  " + accountingForFoods.size());
 			
 			pacmanStart = new Coordinates(briefStop.row, briefStop.column);
 		}
@@ -933,6 +884,8 @@ public class Maze
 			{
 				mazeForm[row][col].visited= false;
 				mazeForm[row][col].parent = null;
+				mazeForm[row][col].distanceTraveled = 0;
+				mazeForm[row][col].recalculateHeuristic();
 			}
 		}
 	}

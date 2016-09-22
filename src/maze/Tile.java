@@ -62,19 +62,12 @@ public class Tile implements Comparable<Tile>
 	@Override
 	public int compareTo(Tile other) 
 	{
-		if(this.distanceToFood < other.distanceToFood)
-			return 5;
-		else if (this.distanceToFood == other.distanceToFood)
-		{
-			if(this.heuristicScore < other.heuristicScore)
-				return 4;
-			if(this.heuristicScore == other.heuristicScore)
-				return 3;
-			else
-				return 2;
-		}
+		if(this.heuristicScore < other.heuristicScore)
+			return other.heuristicScore-this.heuristicScore;
+		else if(this.heuristicScore == other.heuristicScore)
+			return 0;
 		else
-			return 1;
+			return -(other.heuristicScore-this.heuristicScore);
 
 	}
 
