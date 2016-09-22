@@ -16,11 +16,13 @@ public class Maze
 	
 	public int dotsFound = 0;
 	public int dotsTotal;
+	public int tilesExplored = 0;
+	
 	private Tile [][] mazeForm;
 	private int totalRows;
 	private int totalColumns;
 	
-	ArrayList<Tile> open = new ArrayList<Tile>();
+	PriorityQueue<Tile> open = new PriorityQueue<Tile>();
 	ArrayList<Tile> closed = new ArrayList<Tile>();
 	
 	
@@ -42,6 +44,11 @@ public class Maze
 	 */
 	private Coordinates pacmanStart;
 	
+	/**
+	 * actual tile where pacman starts
+	 */
+	private Tile pacmanOrigin;
+	
 	
 	/**
 	 * this is the final destination tile after the search is complete
@@ -61,8 +68,6 @@ public class Maze
 	 * @throws IOException
 	 */
 	
-	
-	private int squaresExplored;
 	
 	
 	public Maze(String fileToParse) throws IOException
@@ -112,6 +117,24 @@ public class Maze
 	 * Displays maze to confirm accuracy
 	 */
 	public void displayMaze()
+	{
+		for (int i = 0; i < totalRows; i++)
+		{
+			for (int m = 0; m < totalColumns; m++)
+			{
+				if(isFoodSpot(i, m))
+					System.out.print(".");
+				else if(locatePacman(i, m))
+					System.out.print("P");
+				else
+					mazeForm[i][m].printTileStatus();
+			}
+			
+			System.out.println("");
+		}
+	}
+	
+	public void displaySpecialMaze()
 	{
 		for (int i = 0; i < totalRows; i++)
 		{
@@ -180,6 +203,7 @@ public class Maze
 	 * @param col
 	 * @return
 	 */
+	
 	public Tile getTile(int row, int col)
 	{
 		
@@ -204,7 +228,7 @@ public class Maze
 	}
 	
 	/**
-	 * helper to erect wass in the maze
+	 * helper to erect walls in the maze
 	 * @param fileToParse
 	 * @throws IOException
 	 */
@@ -295,6 +319,20 @@ public class Maze
 		return false;
 	}
 	
+	
+	/**
+	 * Add it onto list
+	 * @param row
+	 * @param col
+	 * @return
+	 */
+	private boolean fromOrigInventory(int row, int col)
+	{
+		
+		return false;
+	}
+	
+	
 	/**
 	 * locates the pacman object, see if he's in a specific tile
 	 * @param row
@@ -343,12 +381,11 @@ public class Maze
 		
 		searchStore.push(startTile);
 		
-		int squaresSearched = 0;
 		while(searchStore.size() > 0)
 		{
 			
 			Tile currentTile = searchStore.pop();
-			squaresSearched++;
+			tilesExplored++;
 			
 			int currentRow = currentTile.row;
 			int currentColumn = currentTile.column;
@@ -370,35 +407,31 @@ public class Maze
 				searchStore.push(right);
 				right.visited = true;
 				right.parent = currentTile;
-				//squaresSearched++;
 			}
 			if(!up.isWall && !up.visited)
 			{
 				searchStore.push(up);
 				up.visited = true;
 				up.parent = currentTile;
-				//squaresSearched++;
 			}
 			if(!left.isWall && !left.visited)
 			{
 				searchStore.push(left);
 				left.visited = true;
 				left.parent = currentTile;
-				//squaresSearched++;
 			}
 			if(!down.isWall && !down.visited)
 			{
 				searchStore.push(down);
 				down.visited = true;
 				down.parent = currentTile;
-				//squaresSearched++;
 			}
 			
 			
 		}
 		
-		this.squaresExplored = squaresSearched;
 		System.out.println("\n\n\n");
+		traceYourPath(finalDestination, null);
 		showMazePath();
 		
 	}
@@ -418,12 +451,11 @@ public class Maze
 		
 		searchStore.add(startTile);
 		
-		int squaresSearched = 0;
 		while(searchStore.size() > 0)
 		{
 			
 			Tile currentTile = searchStore.poll();
-			squaresSearched++;
+			tilesExplored++;
 			int currentRow = currentTile.row;
 			int currentColumn = currentTile.column;
 			
@@ -470,9 +502,9 @@ public class Maze
 			
 		}
 		
-		this.squaresExplored = squaresSearched;
 		System.out.println("\n\n\n");
-		showMazePath();
+		traceYourPath(finalDestination, null);
+		//showMazePath();
 		System.out.println("\n\n\n");
 	}
 	
@@ -493,12 +525,11 @@ public class Maze
 		
 		searchStore.add(startTile);
 		
-		int squaresSearched = 0;
 		while(searchStore.size() > 0)
 		{
 			
 			Tile currentTile = searchStore.poll();
-			squaresSearched++;
+			tilesExplored++;
 			int currentRow = currentTile.row;
 			int currentColumn = currentTile.column;
 			
@@ -542,9 +573,9 @@ public class Maze
 			
 		}
 		
-		this.squaresExplored = squaresSearched;
 		System.out.println("\n");
-		showMazePath();
+		traceYourPath(finalDestination, null);
+		//showMazePath();
 	}
 	
 	
@@ -552,15 +583,14 @@ public class Maze
 	 * Trace the walk path from end to start
 	 */
 	
-	private void traceYourPath()
+	private void traceYourPath(Tile endTile, Tile onePastStart)
 	{
 		Tile tracer = finalDestination;
 		int counter = 0;
-		while(tracer != null)
+		while(tracer != onePastStart)
 		{
 			backTrace.add(tracer);
 			tracer = tracer.parent;
-			//System.out.println("trace counter" + counter);
 			counter++;
 		}
 		
@@ -593,7 +623,7 @@ public class Maze
 	 */
 	public void showMazePath()
 	{
-		traceYourPath();
+		
 		
 		for (int i = 0; i < totalRows; i++)
 		{
@@ -610,7 +640,7 @@ public class Maze
 			System.out.println("");
 		}
 		
-		System.out.println("Explored squares:  "  + this.squaresExplored);
+		System.out.println("Explored squares:  "  + this.tilesExplored);
 		System.out.println("Path length:  "  + this.backTrace.size());
 	}
 	
@@ -620,33 +650,7 @@ public class Maze
 	 */
 	
 	
-	
-	/**
-	 * Since the priority queue is already given a measurement comparable for the greedy algorithm,
-	 * we use an unsorted list instead.  This finds the least cost item in a given list based on 
-	 * the heuristic score.
-	 * @param yourList			can be the open or closed list
-	 * @return
-	 */
-	
-	private Tile leastCost(ArrayList<Tile> yourList)
-	{
-		int minCost = yourList.get(0).heuristicScore;
-		int counter = 0;
-		int minIndex = 0;
-		while (counter < yourList.size())
-		{
-			if(yourList.get(counter).heuristicScore < minCost)
-			{
-				minCost = yourList.get(counter).heuristicScore;
-				minIndex = counter;
-			}
-			
-			counter++;
-		}
-		return yourList.get(minIndex);
 
-	}
 	
 	
 	
@@ -655,18 +659,15 @@ public class Maze
 	{
 		
 		Tile startTile = this.getTile(thePoint.getRow(), thePoint.getColumn());
-		PriorityQueue<Tile> searchStore = new PriorityQueue<Tile>();
 		
 		
-		int counter = 0;
+		open.add(startTile);
 		
-		searchStore.add(startTile);
-		
-		while (!searchStore.isEmpty())
+		while (!open.isEmpty())
 		{
-			//System.out.println("entered loop");
-			Tile minTile = searchStore.poll();
-			
+			Tile minTile = open.poll();
+			tilesExplored++;
+				
 			int minRow = minTile.row;
 			int minCol = minTile.column;
 			
@@ -702,12 +703,13 @@ public class Maze
 					
 					if(!inOpen(neighbor))
 					{
-						searchStore.add(neighbor);
+						open.add(neighbor);
+						
 					}
 					else
 					{
-						boolean removeNeighbor = searchStore.remove(neighbor);
-						searchStore.add(neighbor);
+						open.remove(neighbor);
+						open.add(neighbor);
 					}
 				}
 				
@@ -720,9 +722,8 @@ public class Maze
 			
 		}
 		
-		this.squaresExplored = counter;
 		System.out.println("\n\n\n");
-		showMazePath();
+		traceYourPath(finalDestination, null);
 		
 	}
 
@@ -735,12 +736,10 @@ public class Maze
 
 	private void populateArrayList(ArrayList<Tile> neighbors, Tile minTile)
 	{
-		
-		populateSuccessor(neighbors, minTile, 1,0);	
-		populateSuccessor(neighbors, minTile, -1,0);
-		populateSuccessor(neighbors, minTile, 0,-1);
 		populateSuccessor(neighbors, minTile, 0,1);
-		
+		populateSuccessor(neighbors, minTile, 1,0);	
+		populateSuccessor(neighbors, minTile, 0,-1);
+		populateSuccessor(neighbors, minTile, -1,0);
 		
 	}
 	
@@ -764,23 +763,6 @@ public class Maze
 		}
 	}
 	
-	
-	/**
-	 * determine if a tile is the same position but lower cost in the terms of distance traveled,
-	 * maybe deprecated b/c priority queue
-	 * @param emu			imitation tile to pass int data
-	 * @param cost			total cost of travel and heuristic
-	 * @param inspection	list to inspect against(open or closed list)
-	 * @return
-	 */
-	/*
-	private boolean samePositionlowerCost(Tile neighborTile, Tile curParent, int newCost, int newDistanceTraveled, PriorityQueue<Tile> )
-	{
-
-		
-		return true;
-	}
-	*/
 	
 	/**
 	 * tile is in closed list
@@ -834,7 +816,10 @@ public class Maze
 	public void A_STAR_MULTI(Coordinates thePoint)
 	{
 		Coordinates pacmanStart = thePoint;
+		Tile origin = getTile(pacmanStart.getRow(), pacmanStart.getColumn());
 		Tile briefStop;
+		
+		int oneLess = accountingForFoods.size()-1;
 		
 		while(!accountingForFoods.isEmpty())
 		{
@@ -870,6 +855,7 @@ public class Maze
 			
 			pacmanStart = new Coordinates(briefStop.row, briefStop.column);
 		}
+		
 	}
 
 
@@ -889,5 +875,6 @@ public class Maze
 			}
 		}
 	}
+	
 	
 }

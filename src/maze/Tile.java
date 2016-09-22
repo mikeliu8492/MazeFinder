@@ -63,11 +63,11 @@ public class Tile implements Comparable<Tile>
 	public int compareTo(Tile other) 
 	{
 		if(this.heuristicScore < other.heuristicScore)
-			return other.heuristicScore-this.heuristicScore;
+			return -1;
 		else if(this.heuristicScore == other.heuristicScore)
 			return 0;
 		else
-			return -(other.heuristicScore-this.heuristicScore);
+			return 1;
 
 	}
 

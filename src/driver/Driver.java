@@ -11,7 +11,7 @@ public class Driver
 	{
 		
 		//change the name to any of the three mazes, and you can follow the basic heuristic
-		String FILE_TO_READ = "mediumSearch.txt";
+		String FILE_TO_READ = "openMaze.txt";
 		
 		Maze myMaze = new Maze(FILE_TO_READ);
 		
@@ -32,9 +32,10 @@ public class Driver
 		 * A* not implemented yet
 		 */
 		
-		myMaze.A_STAR_MULTI(myMaze.getOrigin());
-		System.out.println("Orig dots:  " + myMaze.dotsTotal);
-		System.out.println("found dots:  " + myMaze.dotsFound);
+		myMaze.A_STAR(myMaze.getOrigin());
+		myMaze.showMazePath();
+		//System.out.println("Orig dots:  " + myMaze.dotsTotal);
+		//System.out.println("found dots:  " + myMaze.dotsFound);
 		
 	}
 	
