@@ -18,10 +18,7 @@ public class Driver
 		System.out.println(myMaze.getRows());
 		System.out.println(myMaze.getColumns());
 		
-		//System.out.println("\n\n");
 		myMaze.displayMaze();
-		
-		//System.out.println("\n\n");
 		
 		//myMaze.displayDistances();
 		
