@@ -11,7 +11,7 @@ public class Driver
 	{
 		
 		//change the name to any of the three mazes, and you can follow the basic heuristic
-		String FILE_TO_READ = "openMaze.txt";
+		String FILE_TO_READ = "tinySearch.txt";
 		
 		Maze myMaze = new Maze(FILE_TO_READ);
 		
@@ -29,7 +29,7 @@ public class Driver
 		 * A* not implemented yet
 		 */
 		
-		myMaze.A_STAR(myMaze.getOrigin());
+		myMaze.A_STAR_MULTI(myMaze.getOrigin());
 		myMaze.showMazePath();
 		//System.out.println("Orig dots:  " + myMaze.dotsTotal);
 		//System.out.println("found dots:  " + myMaze.dotsFound);

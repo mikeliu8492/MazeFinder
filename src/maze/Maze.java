@@ -15,7 +15,7 @@ public class Maze
 	 */
 	
 	public int dotsFound = 0;
-	public int dotsTotal;
+	public int dotsTotal = 0;
 	public int tilesExplored = 0;
 	
 	private Tile [][] mazeForm;
@@ -24,8 +24,9 @@ public class Maze
 	
 	PriorityQueue<Tile> open = new PriorityQueue<Tile>();
 	ArrayList<Tile> closed = new ArrayList<Tile>();
+	ArrayList<Tile> permClosed = new ArrayList<Tile>();
 	
-	
+	int pathLength = 0;
 	
 	/**
 	 * the spots where there is dots for pacman to eat
@@ -432,7 +433,7 @@ public class Maze
 		
 		System.out.println("\n\n\n");
 		traceYourPath(finalDestination, null);
-		showMazePath();
+		pathLength = backTrace.size();
 		
 	}
 	
@@ -504,7 +505,7 @@ public class Maze
 		
 		System.out.println("\n\n\n");
 		traceYourPath(finalDestination, null);
-		//showMazePath();
+		pathLength = backTrace.size();
 		System.out.println("\n\n\n");
 	}
 	
@@ -575,7 +576,7 @@ public class Maze
 		
 		System.out.println("\n");
 		traceYourPath(finalDestination, null);
-		//showMazePath();
+		pathLength = backTrace.size();
 	}
 	
 	
@@ -641,7 +642,7 @@ public class Maze
 		}
 		
 		System.out.println("Explored squares:  "  + this.tilesExplored);
-		System.out.println("Path length:  "  + this.backTrace.size());
+		System.out.println("Path length:  "  + this.pathLength);
 	}
 	
 	
@@ -660,13 +661,18 @@ public class Maze
 		
 		Tile startTile = this.getTile(thePoint.getRow(), thePoint.getColumn());
 		
-		
 		open.add(startTile);
 		
 		while (!open.isEmpty())
 		{
 			Tile minTile = open.poll();
-			tilesExplored++;
+			
+			if(!permClosed.contains(minTile))
+			{
+				permClosed.add(minTile);
+				tilesExplored++;
+			}
+			
 				
 			int minRow = minTile.row;
 			int minCol = minTile.column;
@@ -724,7 +730,7 @@ public class Maze
 		
 		System.out.println("\n\n\n");
 		traceYourPath(finalDestination, null);
-		
+		pathLength = backTrace.size();
 	}
 
 	
@@ -816,7 +822,6 @@ public class Maze
 	public void A_STAR_MULTI(Coordinates thePoint)
 	{
 		Coordinates pacmanStart = thePoint;
-		Tile origin = getTile(pacmanStart.getRow(), pacmanStart.getColumn());
 		Tile briefStop;
 		
 		int oneLess = accountingForFoods.size()-1;
@@ -843,6 +848,7 @@ public class Maze
 				dotsFound++;
 			}
 				
+			traceYourPath(briefStop, null);
 			
 			open.clear();
 			closed.clear();
@@ -856,6 +862,8 @@ public class Maze
 			pacmanStart = new Coordinates(briefStop.row, briefStop.column);
 		}
 		
+		this.tilesExplored -= oneLess;
+		this.pathLength -= oneLess;
 	}
 
 
