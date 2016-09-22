@@ -14,6 +14,10 @@ public class Maze
 	 * create the maze form
 	 */
 	
+	private int FIRST_SET = 0;
+	private int SECOND_SET = 65;
+	private int THIRD_SET = 97;
+	
 	public int dotsFound = 0;
 	public int dotsTotal = 0;
 	public int tilesExplored = 0;
@@ -25,6 +29,8 @@ public class Maze
 	PriorityQueue<Tile> open = new PriorityQueue<Tile>();
 	ArrayList<Tile> closed = new ArrayList<Tile>();
 	ArrayList<Tile> permClosed = new ArrayList<Tile>();
+	
+	ArrayList<FoodRepresentation> foodDotList;
 	
 	int pathLength = 0;
 	
@@ -83,6 +89,7 @@ public class Maze
 		distanceFill();
 		dotsTotal = foodSpots.size();
 		dotsFound = 0;
+		foodDotList= new ArrayList<FoodRepresentation>();
 	}
 	
 	
@@ -135,16 +142,18 @@ public class Maze
 		}
 	}
 	
-	public void displaySpecialMaze()
+	public void displaySpecialPath()
 	{
+		System.out.println("displayed food list" + foodDotList.size());
+		
 		for (int i = 0; i < totalRows; i++)
 		{
 			for (int m = 0; m < totalColumns; m++)
 			{
-				if(isFoodSpot(i, m))
+				if(inRepRoster(i, m))
+					printRep(i, m);
+				else if(inTracedPath(i, m))
 					System.out.print(".");
-				else if(locatePacman(i, m))
-					System.out.print("P");
 				else
 					mazeForm[i][m].printTileStatus();
 			}
@@ -321,17 +330,6 @@ public class Maze
 	}
 	
 	
-	/**
-	 * Add it onto list
-	 * @param row
-	 * @param col
-	 * @return
-	 */
-	private boolean fromOrigInventory(int row, int col)
-	{
-		
-		return false;
-	}
 	
 	
 	/**
@@ -837,6 +835,7 @@ public class Maze
 				if(coordinate.getRow() == briefStop.row && coordinate.getColumn() == briefStop.column)
 				{
 					toEliminate = coordinate;
+					addRepRoster(toEliminate);
 					break;
 				}
 					
@@ -857,13 +856,14 @@ public class Maze
 			distanceFill();
 			clearMaze();
 			
-			System.out.println("accounting for food:  " + accountingForFoods.size());
-			
 			pacmanStart = new Coordinates(briefStop.row, briefStop.column);
 		}
 		
 		this.tilesExplored -= oneLess;
 		this.pathLength -= oneLess;
+		
+		System.out.println(this.tilesExplored);
+		System.out.println(this.pathLength);
 	}
 
 
@@ -880,6 +880,59 @@ public class Maze
 				mazeForm[row][col].parent = null;
 				mazeForm[row][col].distanceTraveled = 0;
 				mazeForm[row][col].recalculateHeuristic();
+			}
+		}
+	}
+	
+	private void addRepRoster(Coordinates target)
+	{
+		int targetRow = target.getRow();
+		int targetCol = target.getColumn();
+		
+		System.out.println("nothing yet");
+		
+		if(foodDotList.size() < 10)
+		{
+			System.out.println("added");
+			foodDotList.add(new FoodRepresentation(targetRow, targetCol, FIRST_SET));
+			FIRST_SET++;
+		}
+		
+		else if(foodDotList.size() < 36)
+		{
+			foodDotList.add(new FoodRepresentation(targetRow, targetCol, SECOND_SET));
+			SECOND_SET++;
+		}
+		else
+		{
+			foodDotList.add(new FoodRepresentation(targetRow, targetCol, THIRD_SET));
+			THIRD_SET++;
+		}
+		
+		System.out.println("size of roster    " + foodDotList.size());
+	}
+	
+	private boolean inRepRoster(int row, int col)
+	{
+		for(FoodRepresentation item : foodDotList)
+		{
+			if(item.location.getRow() == row && item.location.getColumn() == col)
+				return true;
+		}
+		
+		return false;
+	}
+	
+	private void printRep(int row, int col)
+	{
+		for(FoodRepresentation item : foodDotList)
+		{
+			if(item.location.getRow() == row && item.location.getColumn() == col)
+			{
+				if(item.symbol < 10)
+					System.out.print(item.symbol);
+				else
+					System.out.print((char)(item.symbol));
 			}
 		}
 	}
